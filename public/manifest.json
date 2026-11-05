@@ -1,0 +1,27 @@
+
+{
+  "manifest_version": 3,
+  "name": "Workspace Manager",
+  "version": "1.0.0",
+  "description": "Manage browser workspaces, tabs and sessions.",
+  "minimum_chrome_version": "114",
+  "permissions": [
+    "storage",
+    "tabs",
+    "sidePanel"
+  ],
+  "action": {
+    "default_title": "Workspace Manager",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  }
+}

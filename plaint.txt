@@ -1,0 +1,29 @@
+
+Giai đoạn 1 – Khởi tạo dự án
+
+- React + TypeScript + Vite
+- Cấu hình Manifest V3
+- Build và cài extension vào Chrome
+  
+  Tiếp theo
+  Giai đoạn 2 – Quản lý Workspace
+- Tạo Workspace mới
+- Chỉnh sửa và xóa Workspace
+- Lưu danh sách Workspace bằng Chrome Storage
+- Hiển thị danh sách Workspace trên Side Panel
+  
+  Giai đoạn 3 – Quản lý Tab
+- Lưu các tab đang mở vào Workspace
+- Đóng và khôi phục nhóm tab
+- Mở lại toàn bộ tab của Workspace
+  
+  Giai đoạn 4 – Quản lý phiên làm việc
+- Lưu phiên làm việc (Session)
+- Khôi phục phiên làm việc
+- Quản lý lịch sử phiên
+  
+  Giai đoạn 5 – Hoàn thiện giao diện
+- Dashboard
+- Tìm kiếm Workspace
+- Cài đặt và tùy chỉnh giao diện
+- Kiểm thử trên Chrome và Edge
