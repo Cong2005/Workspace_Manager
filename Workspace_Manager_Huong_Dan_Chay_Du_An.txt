@@ -1,0 +1,176 @@
+WORKSPACE MANAGER - HUONG DAN CAI DAT VA CHAY DU AN
+
+1. GIOI THIEU
+
+Workspace Manager la Chrome Extension duoc xay dung bang: - React -
+TypeScript - Vite - Chrome Extension API (Manifest V3)
+
+Tai lieu nay huong dan chay lai du an tren may tinh moi sau khi clone tu
+GitHub.
+
+2. CAI DAT CAC CONG CU CAN THIET
+
+Can cai dat: - Node.js (nen dung ban LTS): https://nodejs.org/ - Git:
+https://git-scm.com/ - Visual Studio Code (khong bat buoc):
+https://code.visualstudio.com/ - Google Chrome
+
+Sau khi cai dat, mo CMD hoac Git Bash va kiem tra:
+
+    node -v
+    npm -v
+    git --version
+
+Neu cac lenh khong hien thi phien ban, hay cai dat lai cong cu va mo
+terminal moi.
+
+3. CLONE DU AN TU GITHUB
+
+Mo CMD hoac Git Bash, di den thu muc muon luu du an. Vi du:
+
+    cd /d %USERPROFILE%\Documents
+
+Neu dung Git Bash:
+
+    cd ~/Documents
+
+Clone repository:
+
+    git clone https://github.com/Cong2005/Workspace_Manager.git
+
+Di vao thu muc du an:
+
+    cd Workspace_Manager
+
+4. CAI DAT CAC THU VIEN
+
+Trong thu muc co file package.json, chay:
+
+    npm install
+
+Lenh nay doc package.json va cai dat cac dependencies can thiet. Khong
+can va khong nen clone hoac copy thu muc node_modules tu may khac.
+
+5. CHAY DU AN DE PHAT TRIEN
+
+De mo trang Vite trong trinh duyet va xem giao dien (neu can):
+
+    npm run dev
+
+Vite se hien dia chi local, thuong la http://localhost:5173/. Nhan
+Ctrl + C de dung server.
+
+Luu y: Day la lenh chay moi truong phat trien web. Chrome Extension can
+duoc build va nap tu thu muc dist theo huong dan ben duoi de kiem tra
+cac API cua extension.
+
+6. BUILD CHROME EXTENSION
+
+Moi khi muon tao ban extension de nap vao Chrome, chay:
+
+    npm run build
+
+Neu build thanh cong, Vite tao thu muc:
+
+    dist
+
+Kiem tra dist co cac file quan trong, dac biet la:
+
+    dist\manifest.json
+    dist\popup.html
+    dist\sidepanel.html
+    dist\newtab.html
+    dist\background.js
+
+Ten va cau truc file trong dist phu thuoc cau hinh build hien tai cua du
+an. Neu mot trong cac file tren khong duoc tao, kiem tra lai
+vite.config.ts, manifest.json va cac file HTML dau vao.
+
+7. CAI EXTENSION VAO GOOGLE CHROME
+
+1.  Mo Google Chrome.
+2.  Truy cap: chrome://extensions/
+3.  Bat Developer mode (Che do nha phat trien).
+4.  Chon Load unpacked (Tai tien ich da giai nen).
+5.  Chon thu muc dist trong du an, KHONG chon thu muc goc. Vi du:
+    C:_Manager
+6.  Extension Workspace Manager se xuat hien trong danh sach extension.
+
+Neu da nap extension truoc do va vua build lai: - Quay lai
+chrome://extensions/ - Bam nut Reload tren the Workspace Manager.
+
+8. CAP NHAT DU AN SAU KHI CO THAY DOI TU GITHUB
+
+Neu ban da clone du an va muon lay code moi nhat:
+
+    git pull origin main
+
+Neu co thay doi dependencies (package.json hoac package-lock.json), chay
+lai:
+
+    npm install
+
+Sau do build lai:
+
+    npm run build
+
+Cuoi cung, vao chrome://extensions/ va bam Reload extension.
+
+9. MOT SO LOI THUONG GAP
+
+Loi: ‘node’ is not recognized - Cai dat Node.js LTS. - Dong va mo lai
+terminal, sau do kiem tra node -v.
+
+Loi: ‘npm’ is not recognized - Cai dat Node.js LTS (npm di kem
+Node.js). - Mo terminal moi va kiem tra npm -v.
+
+Loi: Cannot find module / thieu thu vien - Dam bao terminal dang o thu
+muc co package.json. - Chay npm install.
+
+Loi: Manifest is not valid JSON - Kiem tra public/manifest.json co noi
+dung JSON hop le. - Chay npm run build lai. - Dam bao dist/manifest.json
+duoc tao va khong rong.
+
+Loi: Could not load manifest - Trong Chrome, chon dung thu muc dist. -
+Kiem tra dist/manifest.json ton tai.
+
+Loi: Build failed / Cannot resolve entry module - Kiem tra cac file
+popup.html, sidepanel.html, newtab.html nam o thu muc goc cua project
+theo dung cau hinh vite.config.ts. - Kiem tra ten file va chu viet
+hoa/thuong.
+
+10. CAC LENH THUONG DUNG
+
+Cai dependencies: npm install
+
+Chay Vite dev server: npm run dev
+
+Build extension: npm run build
+
+Kiem tra TypeScript: npx tsc -b
+
+Lay code moi tu GitHub: git pull origin main
+
+Kiem tra trang thai Git: git status
+
+11. LUU Y KHI LAM VIEC VOI DU AN
+
+-   Khong commit thu muc node_modules va dist.
+-   Khong dua file .env chua mat khau, token hoac khoa bi mat len
+    GitHub.
+-   Nen commit ca package.json va package-lock.json de may khac cai dat
+    dung dependencies.
+-   Moi lan sua code, chay npm run build de kiem tra truoc khi nap lai
+    extension.
+-   Neu Chrome dang nap extension tu dist, sau khi build thanh cong hay
+    bam Reload tai chrome://extensions/.
+
+REPOSITORY
+
+https://github.com/Cong2005/Workspace_Manager
+
+KET THUC
+
+Quy trinh ngan gon tren may moi: 1. Cai Node.js va Git. 2. git clone
+https://github.com/Cong2005/Workspace_Manager.git 3. cd
+Workspace_Manager 4. npm install 5. npm run build 6. Mo
+chrome://extensions/ va Load unpacked thu muc dist.
