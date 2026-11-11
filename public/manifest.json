@@ -4,11 +4,12 @@
   "name": "Workspace Manager",
   "version": "1.0.0",
   "description": "Manage browser workspaces, tabs and sessions.",
-  "minimum_chrome_version": "114",
+  "minimum_chrome_version": "116",
   "permissions": [
     "storage",
     "tabs",
-    "sidePanel"
+    "sidePanel",
+    "tabGroups"
   ],
   "action": {
     "default_title": "Workspace Manager",
@@ -20,8 +21,5 @@
   },
   "side_panel": {
     "default_path": "sidepanel.html"
-  },
-  "chrome_url_overrides": {
-    "newtab": "newtab.html"
   }
 }
