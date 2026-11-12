@@ -42,6 +42,11 @@ export function useOpenTabs() {
 
   useEffect(() => {
     mounted.current = true;
+    if (typeof chrome === 'undefined' || !chrome.tabs) {
+      setLoading(false);
+      return () => { mounted.current = false; };
+    }
+
     const requestSequence = requestId;
     const timer = refreshTimer;
     const scheduleRefresh = () => {

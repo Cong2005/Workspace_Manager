@@ -31,6 +31,11 @@ export function useGroupRules() {
 
   useEffect(() => {
     mounted.current = true;
+    if (typeof chrome === 'undefined' || !chrome.storage) {
+      setLoading(false);
+      return () => { mounted.current = false; };
+    }
+
     const sequence = requestId;
     const onChanged = (changes: { [key: string]: chrome.storage.StorageChange }, area: string) => {
       if (area === 'local' && Object.keys(changes).some((key) => key.startsWith(GROUP_RULE_KEY_PREFIX))) {
