@@ -1,9 +1,11 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { GROUP_COLORS, type GroupColor, type GroupRuleInput } from '../../types/groupRule';
 import { buildGroupingPreview, applyGroupingPreview, groupSelectedTabs, type GroupingPreview } from '../../services/tabGroupingService';
 import { getCurrentWindowId, getWindowTabs, type OpenTab } from '../tabs/tabsService';
 import { sendGroupRuleCommand } from './groupRuleClient';
 import { useGroupRules } from './useGroupRules';
+import { AUTO_GROUPING_SETTINGS_KEY, getAutoGroupingEnabled,
+  parseAutoGroupingSettings, setAutoGroupingEnabled } from '../../services/autoGroupingSettings';
 
 const emptyRule: GroupRuleInput = { name: '', groupTitle: '', domain: '', color: 'blue' };
 
@@ -22,8 +24,49 @@ export function GroupingPanel({ tabs, selectedIds, clearSelection }: {
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [autoEnabled, setAutoEnabled] = useState(false);
+  const [autoLoading, setAutoLoading] = useState(true);
+  const [autoSaving, setAutoSaving] = useState(false);
+  const [autoError, setAutoError] = useState<string | null>(null);
   const workingRef = useRef(false);
   const selectedInWindow = tabs.filter((tab) => selectedIds.has(tab.id) && !tab.pinned).map((tab) => tab.id);
+
+  useEffect(() => {
+    let mounted = true;
+    let changed = false;
+    void getAutoGroupingEnabled().then((enabled) => {
+      if (mounted) {
+        if (!changed) setAutoEnabled(enabled);
+        setAutoLoading(false);
+      }
+    }).catch((cause) => {
+      if (mounted) {
+        setAutoError(cause instanceof Error ? cause.message : 'Could not load Auto Grouping settings.');
+        setAutoLoading(false);
+      }
+    });
+    const onStorageChanged = (changes: { [key: string]: chrome.storage.StorageChange }, area: string) => {
+      if (area !== 'local' || !changes[AUTO_GROUPING_SETTINGS_KEY]) return;
+      changed = true;
+      try {
+        setAutoEnabled(parseAutoGroupingSettings(changes[AUTO_GROUPING_SETTINGS_KEY].newValue));
+        setAutoError(null);
+      } catch (cause) {
+        setAutoError(cause instanceof Error ? cause.message : 'Auto Grouping settings are invalid.');
+      }
+    };
+    chrome.storage.onChanged.addListener(onStorageChanged);
+    return () => { mounted = false; chrome.storage.onChanged.removeListener(onStorageChanged); };
+  }, []);
+
+  const toggleAutoGrouping = (enabled: boolean) => {
+    if (autoSaving) return;
+    setAutoSaving(true);
+    setAutoError(null);
+    void setAutoGroupingEnabled(enabled).then(() => setAutoEnabled(enabled)).catch((cause) => {
+      setAutoError(cause instanceof Error ? cause.message : 'Could not save Auto Grouping settings.');
+    }).finally(() => setAutoSaving(false));
+  };
 
   const run = async (operation: () => Promise<void>) => {
     if (workingRef.current) return;
@@ -112,6 +155,13 @@ export function GroupingPanel({ tabs, selectedIds, clearSelection }: {
 
     <div className="rounded-xl border bg-white p-4">
       <h3 className="mb-2 text-sm font-semibold">Domain rules</h3>
+      <label className="mb-1 flex items-center gap-2 text-sm font-medium">
+        <input type="checkbox" checked={autoEnabled} disabled={autoLoading || autoSaving}
+          onChange={(event) => toggleAutoGrouping(event.target.checked)} />
+        Enable Auto Grouping
+      </label>
+      <p className="mb-3 text-xs text-gray-500">Automatically group new tabs that match your saved domain rules.</p>
+      {autoError && <p role="alert" className="mb-3 text-xs text-red-700">{autoError}</p>}
       <p className="mb-3 text-xs text-gray-500">Oldest matching rule wins. Rules sharing a group name use the oldest applicable rule's color.</p>
       <form onSubmit={(event) => { void saveRule(event); }} className="space-y-2">
         <label className="block text-xs">Rule name

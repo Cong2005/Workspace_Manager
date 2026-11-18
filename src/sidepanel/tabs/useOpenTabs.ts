@@ -43,7 +43,7 @@ export function useOpenTabs() {
   useEffect(() => {
     mounted.current = true;
     if (typeof chrome === 'undefined' || !chrome.tabs) {
-      setLoading(false);
+      queueMicrotask(() => { if (mounted.current) setLoading(false); });
       return () => { mounted.current = false; };
     }
 

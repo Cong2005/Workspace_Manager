@@ -32,7 +32,7 @@ export function useGroupRules() {
   useEffect(() => {
     mounted.current = true;
     if (typeof chrome === 'undefined' || !chrome.storage) {
-      setLoading(false);
+      queueMicrotask(() => { if (mounted.current) setLoading(false); });
       return () => { mounted.current = false; };
     }
 

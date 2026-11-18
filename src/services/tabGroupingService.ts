@@ -94,16 +94,18 @@ function findExistingGroup(groups: chrome.tabGroups.TabGroup[], title: string) {
 
 async function groupIntoTarget(
   tabs: OpenTab[], title: string, color: GroupColor, existingGroups: chrome.tabGroups.TabGroup[],
+  preserveExistingMetadata = false, targetWindowId?: number,
 ): Promise<{ groupedTabs: number; created: boolean }> {
   const existing = findExistingGroup(existingGroups, title);
   const eligible = existing ? tabs.filter((tab) => tab.groupId !== existing.id) : tabs;
   let groupId = existing?.id;
   if (eligible.length > 0) {
     const tabIds = eligible.map((tab) => tab.id) as [number, ...number[]];
-    groupId = await chrome.tabs.group(existing ? { tabIds, groupId: existing.id } : { tabIds });
+    groupId = await chrome.tabs.group(existing ? { tabIds, groupId: existing.id } :
+      targetWindowId === undefined ? { tabIds } : { tabIds, createProperties: { windowId: targetWindowId } });
   }
   if (groupId === undefined) return { groupedTabs: 0, created: false };
-  if (existing?.title === title && existing.color === color) {
+  if (existing && (preserveExistingMetadata || (existing.title === title && existing.color === color))) {
     return { groupedTabs: eligible.length, created: false };
   }
   try {
@@ -113,6 +115,35 @@ async function groupIntoTarget(
     throw new Error('Tabs may have been grouped, but Chrome could not set the group name or color.');
   }
   return { groupedTabs: eligible.length, created: !existing };
+}
+
+export type AutoGroupOutcome = 'grouped' | 'already-grouped' | 'unmatched' | 'pending' | 'changed';
+
+export async function autoGroupNewTab(
+  tabId: number, expectedWindowId: number, expectedUrl: string | undefined, rules: GroupRule[],
+): Promise<AutoGroupOutcome> {
+  let tab: chrome.tabs.Tab;
+  try { tab = await chrome.tabs.get(tabId); }
+  catch { return 'changed'; }
+  if (tab.windowId !== expectedWindowId || tab.url !== expectedUrl) return 'changed';
+  if (tab.pinned || (tab.groupId !== undefined && tab.groupId !== -1)) return 'already-grouped';
+
+  const preview = buildGroupingPreview([tab as OpenTab], rules);
+  if (preview.matchingTabs === 0) {
+    try {
+      const url = new URL(tab.url ?? '');
+      return url.protocol === 'http:' || url.protocol === 'https:' ? 'unmatched' : 'pending';
+    } catch { return 'pending'; }
+  }
+
+  const plan = preview.groups[0];
+  const groups = await chrome.tabGroups.query({ windowId: expectedWindowId });
+  try { tab = await chrome.tabs.get(tabId); }
+  catch { return 'changed'; }
+  if (tab.windowId !== expectedWindowId || tab.url !== expectedUrl || tab.pinned ||
+    (tab.groupId !== undefined && tab.groupId !== -1)) return 'changed';
+  await groupIntoTarget([tab as OpenTab], plan.title, plan.color, groups, true, expectedWindowId);
+  return 'grouped';
 }
 
 export async function groupSelectedTabs(

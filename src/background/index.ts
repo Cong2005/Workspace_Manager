@@ -11,6 +11,23 @@ import { createSession, deleteSession, getSessionById, getSessions } from '../se
 import type { SessionCommand, SessionResponse } from '../types/session';
 import { createGroupRule, deleteGroupRule, getGroupRules, updateGroupRule } from '../services/groupRuleService';
 import type { GroupRuleCommand, GroupRuleResponse } from '../types/groupRule';
+import { createAutoGroupingController } from '../services/autoGroupingService';
+
+const autoGrouping = createAutoGroupingController();
+const logAutoGroupingError = (error: unknown) => console.error('Auto Grouping failed:', error);
+
+chrome.tabs.onCreated.addListener((tab) => {
+  void autoGrouping.onCreated(tab).catch(logAutoGroupingError);
+});
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  if (changeInfo.url !== undefined || changeInfo.status !== undefined) {
+    void autoGrouping.onUpdated(tabId).catch(logAutoGroupingError);
+  }
+});
+chrome.tabs.onRemoved.addListener((tabId) => {
+  void autoGrouping.onRemoved(tabId).catch(logAutoGroupingError);
+});
+void autoGrouping.resumePending().catch(logAutoGroupingError);
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log('Workspace Manager installed!');
